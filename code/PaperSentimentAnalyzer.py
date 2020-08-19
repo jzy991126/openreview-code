@@ -8,6 +8,7 @@ from SentimentPredictor import MyDataGenerator, tokenizer, MAX_LEN, aim_list, se
 DATASETS_PATH = os.path.abspath('../datasets')
 JSON_PATH = os.path.join(DATASETS_PATH, 'datasetv0.json')
 SENTENCE_MODEL_PATH = os.path.abspath('../model/sentence-electra-models')
+RESULT_PATH = '../result/sentiment_analyze.json'
 
 
 def read_json_data(data_path):
@@ -40,6 +41,7 @@ def analyse(review_list):
 def main():
 	result = {}
 	review_data = get_review_data()
+	all_data = read_json_data(JSON_PATH)
 
 	length_data = []
 	key_data = []
@@ -48,6 +50,8 @@ def main():
 		length_data.append(len(val))
 		key_data.append(key)
 		sentence_data.extend(val)
+		result[key] = {}
+		result[key]['citation'] = all_data[key]['citation']
 
 	for aim in aim_list:
 		print(aim)
@@ -61,7 +65,7 @@ def main():
 			result[key][aim] = analyze_result[now_index:now_index + length_data[index]]
 			now_index += length_data[index]
 
-	with open('result.json', 'w') as f:
+	with open(RESULT_PATH, 'w') as f:
 		json.dump(result, f)
 
 

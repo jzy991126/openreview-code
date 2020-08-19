@@ -105,6 +105,7 @@ sentiment_predictor = SentimentPredictor(CONFIG_PATH, CHECKPOINT_PATH, NUM_CLASS
 tokenizer = Tokenizer(DICT_PATH, do_lower_case=True)
 aim_list = ['motivation', 'experiment', 'readable', 'relatework', 'novel']
 
+
 def main(aim):
 	original_data = read_excel_data(EXCEL_DATA_PATH, aim)
 
