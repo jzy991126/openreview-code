@@ -1,5 +1,6 @@
 import json
 import os
+
 from tqdm import tqdm
 
 from SentimentPredictor import MyDataGenerator, tokenizer, MAX_LEN, aim_list, sentiment_predictor
@@ -26,20 +27,22 @@ def get_review_data():
 
 
 def analyse(review_list):
-	result_dict = {}
 	datas = MyDataGenerator(review_list, tokenizer, MAX_LEN)
-	for aim in aim_list:
-		sentiment_predictor.load_weights(os.path.join(SENTENCE_MODEL_PATH, aim))
-		result = sentiment_predictor.predict(datas)
-		result_dict[aim] = result
-	return result_dict
+	result = sentiment_predictor.predict(datas)
+	return result
 
 
 def main():
 	result = {}
 	review_data = get_review_data()
-	for key, val in tqdm(review_data.items()):
-		result[key] = analyse(val)
+
+	for aim in aim_list:
+		print(aim)
+		sentiment_predictor.load_weights(os.path.join(SENTENCE_MODEL_PATH, aim))
+		for key, val in tqdm(review_data.items()):
+			if key not in result:
+				result[key] = {}
+			result[key][aim] = analyse(val)
 	with open('result.json', 'w') as f:
 		json.dump(result, f)
 
