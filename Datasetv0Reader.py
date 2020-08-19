@@ -7,19 +7,6 @@ DATASET_LIST = os.listdir(DATASET_ROOT_PATH)
 OUTPUT_PATH = 'datasetv0.json'
 
 
-def get_id2titile_dict(citation_path):
-	id2title = {}
-
-	with open(citation_path) as f:
-		content = f.readlines()
-		for line in content:
-			line = line.strip()
-			info = line.split('\t')
-			id2title[int(info[0])] = info[1]
-
-	return id2title
-
-
 def my_merge_dict(dict_1, dict_2):
 	for key, value in dict_1.items():
 		if key not in dict_2:

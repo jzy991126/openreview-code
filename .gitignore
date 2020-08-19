@@ -132,3 +132,4 @@ Datasetv0/
 model/
 result/
 sentence-data/predictdata.CSV
+datasetv0.json
