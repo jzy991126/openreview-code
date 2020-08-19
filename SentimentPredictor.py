@@ -1,0 +1,142 @@
+import os
+import string
+
+import pandas as pd
+from bert4keras.backend import keras, set_gelu
+from bert4keras.models import build_transformer_model
+from bert4keras.optimizers import Adam, extend_with_piecewise_linear_lr
+from bert4keras.snippets import sequence_padding, DataGenerator
+from bert4keras.tokenizers import Tokenizer
+from keras.layers import Lambda, Dense
+
+set_gelu('tanh')
+
+CONFIG_PATH = os.path.abspath('electra-small/bert_config_tiny.json')
+CHECKPOINT_PATH = os.path.abspath('electra-small/electra_small')
+DICT_PATH = os.path.abspath('electra-small/vocab.txt')
+DATA_PATH = os.path.abspath('sentence-data/predictdata.xlsx')
+MODEL_PATH = os.path.abspath('model')
+RESULT_PATH = os.path.abspath('result')
+
+NUM_CLASSES = 3
+MAX_LEN = 256
+BATCH_SIZE = 32
+
+
+def read_excel_data(path, column_name):
+	original_data = pd.read_excel(path)
+	text_list = original_data[column_name].tolist()
+	return_list = []
+	for text in text_list:
+		if isinstance(text, str):
+			return_list.append([str(text).rstrip(string.digits), 0])
+	return return_list
+
+
+# def evaluate(data, model):
+# 	total, right = 0., 0.
+# 	for x_true, y_true in data:
+# 		y_pred = model.predict(x_true).argmax(axis=1)
+# 		y_true = y_true[:, 0]
+# 		total += len(y_true)
+# 		right += (y_true == y_pred).sum()
+# 	return right / total
+
+
+# def predict(data, model):
+# 	predict_label = []
+# 	for x_true, y_true in data:
+# 		y_pred = model.predict(x_true).argmax(axis=1)
+# 		predict_label.append(y_pred)
+# 	return predict_label
+
+
+# import sys
+# sys.exit()
+
+class MyDataGenerator(DataGenerator):
+
+	def __init__(self, data, tokenizer, max_len):
+		super(MyDataGenerator, self).__init__(data)
+		self.tokenizer = tokenizer
+		self.max_len = max_len
+
+	def __iter__(self, random=False):
+		batch_token_ids, batch_segment_ids, batch_labels = [], [], []
+		for is_end, (text, label) in self.sample(random):
+			token_ids, segment_ids = self.tokenizer.encode(text, max_length=self.max_len)
+			batch_token_ids.append(token_ids)
+			batch_segment_ids.append(segment_ids)
+			batch_labels.append([label])
+			if len(batch_token_ids) == self.batch_size or is_end:
+				batch_token_ids = sequence_padding(batch_token_ids)
+				batch_segment_ids = sequence_padding(batch_segment_ids)
+				batch_labels = sequence_padding(batch_labels)
+				yield [batch_token_ids, batch_segment_ids], batch_labels
+				batch_token_ids, batch_segment_ids, batch_labels = [], [], []
+
+
+class SentimentPredictor(object):
+
+	def __init__(self, config_path, checkpoint_path, num_classes):
+		self.num_classes = num_classes
+		self.model = self.__init_model(config_path, checkpoint_path)
+
+	def __init_model(self, config_path, checkpoint_path):
+		bert = build_transformer_model(config_path=config_path, checkpoint_path=checkpoint_path, model='electra',
+		                               return_keras_model=False)
+		output = Lambda(lambda x: x[:, 0], name='CLS-token')(bert.model.output)
+		output = Dense(units=self.num_classes, activation='softmax', kernel_initializer=bert.initializer)(output)
+		AdamLR = extend_with_piecewise_linear_lr(Adam)
+		model = keras.models.Model(bert.model.input, output)
+		model.compile(
+			loss='sparse_categorical_crossentropy',
+			optimizer=AdamLR(learning_rate=1e-3, lr_schedule={1000: 1, 2000: 0.1}),
+			metrics=['accuracy'],
+		)
+		return model
+
+	def load_weights(self, model_path):
+		self.model.load_weights(model_path)
+
+	def predict(self, data):
+		predict_label = []
+		for x_true, y_true in data:
+			y_pred = self.model.predict(x_true).argmax(axis=1)
+			predict_label.append(y_pred)
+		return predict_label
+
+
+def write_result_to_file(predict_result, data, file_path):
+	with open(file_path, 'w', encoding='utf-8') as f:
+		written_sum = 0
+		for batch in predict_result:
+			for line_result in batch:
+				f.write(data[written_sum][0] + '\n')
+				f.write(str(line_result) + ' \n')
+				written_sum += 1
+
+
+def main(aim):
+	original_data = read_excel_data(DATA_PATH, aim)
+	tokenizer = Tokenizer(DICT_PATH, do_lower_case=True)
+	data = MyDataGenerator(original_data, tokenizer, MAX_LEN)
+	sentiment_predictor.load_weights(os.path.join(MODEL_PATH, aim))
+	predict_result = sentiment_predictor.predict(data)
+
+	write_result_to_file(predict_result, original_data, os.path.join(RESULT_PATH, aim + '.txt'))
+
+
+sentiment_predictor = SentimentPredictor(CONFIG_PATH, CHECKPOINT_PATH, NUM_CLASSES)
+
+# print(j)
+# print(predict_result)
+# evaluate_result = evaluate(pre_predict, model)
+# print(u'final test acc: %05f\n' % (evaluate(pre_predict, model)))
+
+
+if __name__ == '__main__':
+	aim_list = ['motivation', 'experiment', 'readable', 'relatework']
+	for aim in aim_list:
+		print(aim)
+		main(aim)

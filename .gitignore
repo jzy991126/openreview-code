@@ -128,3 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
+Datasetv0/
+model/
+result/
+sentence-data/predictdata.CSV
