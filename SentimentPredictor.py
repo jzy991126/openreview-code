@@ -16,7 +16,7 @@ ROOT_PATH = os.path.abspath('./')
 CONFIG_PATH = os.path.join(ROOT_PATH, 'electra-small/bert_config_tiny.json')
 CHECKPOINT_PATH = os.path.join(ROOT_PATH, 'electra-small/electra_small')
 DICT_PATH = os.path.join(ROOT_PATH, 'electra-small/vocab.txt')
-DATA_PATH = os.path.join(ROOT_PATH, 'sentence-data/predictdata.xlsx')
+EXCEL_DATA_PATH = os.path.join(ROOT_PATH, 'sentence-data/predictdata.xlsx')
 MODEL_PATH = os.path.join(ROOT_PATH, 'model')
 RESULT_PATH = os.path.join(ROOT_PATH, 'result')
 
@@ -108,7 +108,7 @@ def write_result_to_file(predict_result, data, file_path, write_sentences=True):
 
 
 def main(aim):
-	original_data = read_excel_data(DATA_PATH, aim)
+	original_data = read_excel_data(EXCEL_DATA_PATH, aim)
 
 	data = MyDataGenerator(original_data, tokenizer, MAX_LEN)
 	sentiment_predictor.load_weights(os.path.join(MODEL_PATH, aim))
@@ -117,12 +117,12 @@ def main(aim):
 	write_result_to_file(predict_result, original_data, os.path.join(RESULT_PATH, aim + '.txt'))
 
 
-sentiment_predictor = SentimentPredictor(CONFIG_PATH, CHECKPOINT_PATH, NUM_CLASSES)
-tokenizer = Tokenizer(DICT_PATH, do_lower_case=True)
-
 if __name__ == '__main__':
 	# aim_list = ['motivation', 'experiment', 'readable', 'relatework', 'novel']
 	aim_list = ['motivation', 'experiment', 'readable', 'relatework', 'novel']
 	for aim in aim_list:
 		print(aim)
 		main(aim)
+
+sentiment_predictor = SentimentPredictor(CONFIG_PATH, CHECKPOINT_PATH, NUM_CLASSES)
+tokenizer = Tokenizer(DICT_PATH, do_lower_case=True)
