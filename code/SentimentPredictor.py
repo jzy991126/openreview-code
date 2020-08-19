@@ -103,7 +103,7 @@ def write_result_to_file(predict_result, data, file_path, write_sentences=True):
 
 sentiment_predictor = SentimentPredictor(CONFIG_PATH, CHECKPOINT_PATH, NUM_CLASSES)
 tokenizer = Tokenizer(DICT_PATH, do_lower_case=True)
-
+aim_list = ['motivation', 'experiment', 'readable', 'relatework', 'novel']
 
 def main(aim):
 	original_data = read_excel_data(EXCEL_DATA_PATH, aim)
@@ -117,7 +117,7 @@ def main(aim):
 
 if __name__ == '__main__':
 	# aim_list = ['motivation', 'experiment', 'readable', 'relatework', 'novel']
-	aim_list = ['motivation', 'experiment', 'readable', 'relatework', 'novel']
+
 	for aim in aim_list:
 		print(aim)
 		main(aim)
