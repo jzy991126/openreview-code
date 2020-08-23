@@ -5,24 +5,24 @@ from utils import read_json_data
 DATA_PATH = '../result/processed_token_result.json'
 
 
-def judge_state(result_list):
-	pos = result_list.count(1)
-	neg = result_list.count(0)
-	if pos > 0 :
-		return 1
-	elif pos == neg and neg == 0:
-		return 0
-	else:
-		return -1
+# def judge_state(result_list):
+# 	pos = result_list.count(1)
+# 	neg = result_list.count(0)
+# 	if pos > 0 :
+# 		return 1
+# 	elif pos == neg and neg == 0:
+# 		return 0
+# 	else:
+# 		return -1
 
 
 def draw_one(data, aspect):
 	citation = [v['citation'] for k, v in data.items()]
-	state = [judge_state(v[aspect]) for k, v in data.items()]
+	state = [v['reviews'][aspect] for k, v in data.items()]
 	for citation, state, index in zip(citation, state, range(len(state))):
 		if citation > 400:
 			continue
-		if state == -1:
+		if state == 0:
 			plt.scatter(index, citation + 1, alpha=0.6, c='red', s=13)
 		elif state == 1:
 			plt.scatter(index, citation, alpha=0.6, c='green', s=13)
@@ -38,7 +38,7 @@ def main():
 	pos = 0
 
 	for aim in aim_list:
-		draw_one(data, aim, pos)
+		draw_one(data, aim)
 		pos += 1
 
 

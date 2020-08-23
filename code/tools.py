@@ -86,7 +86,10 @@ def cal_ave_citation_with_sentiment():
 	for key, val in res.items():
 		print(key)
 		for _ in range(2):
-			print(_)
+			if _ == 0:
+				print('负面情感平均引用')
+			else:
+				print('正面情感平均引用')
 			if val['count'][_] == 0:
 				print('zero count')
 			else:
