@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from utils import read_json_data
 
-DATA_PATH = '../result/sentiment_analyze.json'
+DATA_PATH = '../result/processed_token_result.json'
 
 
 def judge_state(result_list):
@@ -16,7 +16,7 @@ def judge_state(result_list):
 		return -1
 
 
-def draw_one(data, aspect, pos):
+def draw_one(data, aspect):
 	citation = [v['citation'] for k, v in data.items()]
 	state = [judge_state(v[aspect]) for k, v in data.items()]
 	for citation, state, index in zip(citation, state, range(len(state))):

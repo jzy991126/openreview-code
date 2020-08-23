@@ -1,0 +1,40 @@
+{
+  "novel": [
+    "novel",
+    "novelty",
+    "originality",
+    "idea"
+  ],
+  "motivation": [
+    "motivation",
+    "motivate",
+    "motivated"
+  ],
+  "relatework": [
+    "related work",
+    "survey",
+    "review",
+    "previous work",
+    "cite",
+    "cited",
+    "citation"
+  ],
+  "experiment": [
+    "experiments",
+    "empirically",
+    "empirical",
+    "experimental",
+    "evaluation",
+    "results",
+    "data"
+  ],
+  "readable": [
+    "presentation",
+    "writing",
+    "writen",
+    "structure",
+    "organization",
+    "structured",
+    "explained"
+  ]
+}
