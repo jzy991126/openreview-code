@@ -35,7 +35,7 @@ def get_sentiment(predicts):
 def get_final_sentiment(sentiments):
 	data = []
 	for sentiment in sentiments:
-		if sentiment >= 0:
+		if sentiment >= 0 and sentiment != 2:
 			data.append(sentiment)
 	if len(data) == 0:
 		return -1
@@ -44,11 +44,13 @@ def get_final_sentiment(sentiments):
 		return data[0]
 	elif _count == 2:
 		return 0 if data.count(0) >= data.count(1) else 1
+	else:
+		return -1
 
 
 def process_sentiment_data():
-	data_path = os.path.join(RESULT_DIR, 'token_result.json')
-	result_path = os.path.join(RESULT_DIR, 'processed_token_result.json')
+	data_path = os.path.join(RESULT_DIR, 'old_all_info.json')
+	result_path = os.path.join(RESULT_DIR, 'processed_old_all_info.json')
 	res = {}
 	data = read_json_data(data_path)
 	for key, val in data.items():
@@ -56,6 +58,25 @@ def process_sentiment_data():
 		res[key]['citation'] = val['citation']
 		res[key]['reviews'] = {}
 		for aspect, sentiments in val['reviews'].items():
+			temp = []
+			for sentiment in sentiments:
+				emotion = get_sentiment(sentiment)
+				temp.append(emotion)
+			res[key]['reviews'][aspect] = get_final_sentiment(temp)
+	with open(result_path, 'w') as f:
+		json.dump(res, f)
+
+
+def process_old_sentiment_data():
+	data_path = os.path.join(RESULT_DIR, 'old_all_info.json')
+	result_path = os.path.join(RESULT_DIR, 'processed_old_all_info.json')
+	res = {}
+	data = read_json_data(data_path)
+	for key, val in data.items():
+		res[key] = {}
+		res[key]['citation'] = val['citation']
+		res[key]['reviews'] = {}
+		for aspect, sentiments in val['sentiment'].items():
 			temp = []
 			for sentiment in sentiments:
 				emotion = get_sentiment(sentiment)
@@ -97,7 +118,7 @@ def cal_ave_citation_with_sentiment():
 
 
 def main():
-	cal_ave_citation_with_sentiment()
+	process_old_sentiment_data()
 
 
 if __name__ == '__main__':
