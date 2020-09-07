@@ -134,3 +134,5 @@ result/
 sentence-data/predictdata.CSV
 datasetv0.json
 datasets/sentence-data/predictdata.CSV
+/datasets/old-dataset/all.json
+/datasets/old-dataset/all_with_cite.json

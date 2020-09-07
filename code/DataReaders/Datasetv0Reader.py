@@ -119,10 +119,17 @@ class Davasetv0Reader(object):
 
 def main():
 	reader = Davasetv0Reader(DATASET_ROOT_PATH)
-	all_info = reader.read_all_info()
-	with open(OUTPUT_PATH, 'w') as f:
-		json.dump(all_info, f)
+	# all_info = reader.read_all_info()
+	# with open(OUTPUT_PATH, 'w') as f:
+	# 	json.dump(all_info, f)
 
+	ICLR_info = reader.read_dataset_info('ICLR')
+	NIPS_info = reader.read_dataset_info('NIPS')
+
+	with open(os.path.join(DATASETS_PATH,'ICLR.json'),'w') as f:
+		json.dump(ICLR_info,f,indent=4)
+	with open(os.path.join(DATASETS_PATH,'NIPS.json'),'w') as f:
+		json.dump(NIPS_info,f,indent=4)
 
 # a = reader.read_reviews('ICLR')
 
