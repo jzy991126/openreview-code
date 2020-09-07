@@ -136,3 +136,7 @@ datasetv0.json
 datasets/sentence-data/predictdata.CSV
 /datasets/old-dataset/all.json
 /datasets/old-dataset/all_with_cite.json
+code/ICLR-feature.txt
+code/NIPS-feature.txt
+datasets/ICLR.json
+datasets/NIPS.json
